@@ -27,18 +27,6 @@ const analytics = firebase.analytics();
 function App() {
   const [user] = useAuthState(auth);
 
-  // useEffect(() => {
-  //   // Request permission for notifications
-  //   Notification.requestPermission().then((permission) => {
-  //     if (permission === "granted") {
-  //       const token = messaging.getToken();
-  //       console.log("Your token is:", token);
-  //     } else {
-  //       console.log("Notification permission denied.");
-  //     }
-  //   });
-  // }, []);
-
   return (
     <div className="App">
       <header>
@@ -100,9 +88,18 @@ function ChatRoom() {
     });
 
     setFormValue("");
-    setNotificationCount((prevCount) => prevCount + 1);
     dummy.current.scrollIntoView({ behavior: "smooth" });
   };
+
+  useEffect(() => {
+    // Update document title with the count of received messages
+    if (messages && messages.length > 0) {
+      const receivedMessagesCount = messages.filter(
+        (msg) => msg.uid !== auth.currentUser.uid
+      ).length;
+      document.title = `Live Chat (${receivedMessagesCount})`;
+    }
+  }, [messages]);
 
   return (
     <>
@@ -137,9 +134,8 @@ function ChatMessage(props) {
     <>
       <div className={`message ${messageClass}`}>
         <img
-          src={
-            photoURL || "https://api.adorable.io/avatars/23/abott@adorable.png"
-          }
+          src={photoURL || "https://api.adorable.io/avatars/23/adorable.png"}
+          alt="User Avatar"
         />
         <p>{text}</p>
       </div>
