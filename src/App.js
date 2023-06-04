@@ -8,6 +8,7 @@ import "firebase/compat/analytics";
 
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollectionData } from "react-firebase-hooks/firestore";
+import ChatMessage from "./components/ChatMessage";
 
 firebase.initializeApp({
   apiKey: "AIzaSyDj0f0Mssb5b5KA5LMSOsUwAPE1hu4VzFk",
@@ -110,25 +111,6 @@ function ChatRoom() {
           <SendIcon />
         </button>
       </form>
-    </>
-  );
-}
-
-function ChatMessage(props) {
-  const { text, uid, photoURL } = props.message;
-
-  const messageClass = uid === auth.currentUser.uid ? "sent" : "received";
-
-  return (
-    <>
-      <div className={`message ${messageClass}`}>
-        <img
-          src={
-            photoURL || "https://api.adorable.io/avatars/23/abott@adorable.png"
-          }
-        />
-        <p>{text}</p>
-      </div>
     </>
   );
 }
