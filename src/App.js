@@ -1,10 +1,11 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./App.css";
 import SendIcon from "@mui/icons-material/Send";
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import "firebase/compat/firestore";
 import "firebase/compat/analytics";
+import "firebase/compat/messaging";
 
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollectionData } from "react-firebase-hooks/firestore";
@@ -18,12 +19,25 @@ firebase.initializeApp({
   appId: "1:668292096958:web:ec85fff2495f4d03b00fef",
 });
 
+const messaging = firebase.messaging();
 const auth = firebase.auth();
 const firestore = firebase.firestore();
 const analytics = firebase.analytics();
 
 function App() {
   const [user] = useAuthState(auth);
+
+  // useEffect(() => {
+  //   // Request permission for notifications
+  //   Notification.requestPermission().then((permission) => {
+  //     if (permission === "granted") {
+  //       const token = messaging.getToken();
+  //       console.log("Your token is:", token);
+  //     } else {
+  //       console.log("Notification permission denied.");
+  //     }
+  //   });
+  // }, []);
 
   return (
     <div className="App">
@@ -48,9 +62,7 @@ function SignIn() {
       <button className="sign-in" onClick={signInWithGoogle}>
         Sign in with Google
       </button>
-      <p>
-        Do not violate the community guidelines or you will be banned for life!
-      </p>
+      <p>Violation of the community guidelines can banne for life!</p>
     </>
   );
 }
@@ -71,6 +83,7 @@ function ChatRoom() {
   const query = messagesRef.orderBy("createdAt").limit(25);
 
   const [messages] = useCollectionData(query, { idField: "id" });
+  const [notificationCount, setNotificationCount] = useState(0);
 
   const [formValue, setFormValue] = useState("");
 
@@ -87,6 +100,7 @@ function ChatRoom() {
     });
 
     setFormValue("");
+    setNotificationCount((prevCount) => prevCount + 1);
     dummy.current.scrollIntoView({ behavior: "smooth" });
   };
 
