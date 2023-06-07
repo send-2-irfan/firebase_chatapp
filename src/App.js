@@ -6,6 +6,7 @@ import "firebase/compat/auth";
 import "firebase/compat/firestore";
 import "firebase/compat/analytics";
 import "firebase/compat/messaging";
+import Badge from "@mui/material/Badge";
 
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollectionData } from "react-firebase-hooks/firestore";
@@ -26,16 +27,56 @@ const analytics = firebase.analytics();
 
 function App() {
   const [user] = useAuthState(auth);
+  const [newMessageCount, setNewMessageCount] = useState(0);
+
+  useEffect(() => {
+    if (newMessageCount > 0) {
+      document.title = `Live Chat (${newMessageCount})`;
+    } else {
+      document.title = "Live Chat";
+    }
+  }, [newMessageCount]);
 
   return (
     <div className="App">
       <header>
-        <h1>Live Chat</h1>
+        <h1>
+          {user && (
+            <NewMessageBadge
+              newMessageCount={newMessageCount}
+              setNewMessageCount={setNewMessageCount}
+            />
+          )}
+        </h1>
         <SignOut />
       </header>
 
-      <section>{user ? <ChatRoom /> : <SignIn />}</section>
+      <section>
+        {user ? (
+          <ChatRoom setNewMessageCount={setNewMessageCount} />
+        ) : (
+          <SignIn />
+        )}
+      </section>
     </div>
+  );
+}
+
+function NewMessageBadge({ newMessageCount, setNewMessageCount }) {
+  const messagesRef = firestore.collection("messages");
+  const query = messagesRef.where("uid", "!=", auth.currentUser.uid);
+  const [newMessages] = useCollectionData(query);
+
+  useEffect(() => {
+    if (newMessages) {
+      setNewMessageCount(newMessages.length);
+    }
+  }, [newMessages, setNewMessageCount]);
+
+  return (
+    <Badge badgeContent={newMessageCount} color="primary">
+      <span className="badge">New Messages</span>
+    </Badge>
   );
 }
 

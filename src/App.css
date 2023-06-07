@@ -147,3 +147,14 @@ img {
   border-radius: 50%;
   margin: 2px 5px;
 }
+
+.new-message-badge {
+  position: relative;
+  top: -2px;
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background-color: red;
+  border-radius: 50%;
+  margin-left: 5px;
+}
